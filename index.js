@@ -1,15 +1,53 @@
-const express = require('express');
-const { resolve } = require('path');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const app = express();
-const port = 3010;
-
-app.use(express.static('static'));
-
-app.get('/', (req, res) => {
-  res.sendFile(resolve(__dirname, 'pages/index.html'));
+// Define the Profile schema as an embedded document
+const ProfileSchema = new Schema({
+  firstName: {
+    type: String,
+    required: true
+  },
+  lastName: {
+    type: String,
+    required: true
+  },
+  age: {
+    type: Number,
+    required: true
+  }
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+// Define the User schema
+const UserSchema = new Schema({
+  username: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  roles: {
+    type: [String], // Array of strings to represent different roles
+    default: ['user'] // Default role is 'user'
+  },
+  profile: {
+    type: ProfileSchema,
+    required: true // Embed the Profile schema and make it required
+  },
+  lastLogin: {
+    type: Date
+  }
 });
+
+// Create a model for the User schema
+const User = mongoose.model('User', UserSchema);
+
+// Export the User model
+module.exports = User;
